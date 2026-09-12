@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="theme-color" content="#101318"><meta name="description" content="다중 센서 융합 기반 사용자 추종형 스마트 카트의 사진 기반 인터랙티브 3D 재구성. 프레임, 구동계, UWB, LiDAR와 하부 전장 구조를 살펴보세요.">
+ <title>Smart Cart Studio | 사용자 추종형 스마트 카트</title>
+ <link rel="icon" type="image/svg+xml" href="./assets/icons/favicon.svg">
+ <link rel="stylesheet" href="./css/styles.css">
+ <script defer src="./js/math.js"></script><script defer src="./js/geometry.js"></script><script defer src="./js/cart-model.js"></script><script defer src="./js/renderer.js"></script><script defer src="./js/app.js"></script>
+</head>
+<body>
+<svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+ <symbol id="i-cube" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3ZM4 7.5l8 4.5 8-4.5M12 12v9"/></symbol>
+ <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M5 15v5h14v-5"/></symbol>
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-7h6v7"/></symbol>
+ <symbol id="i-orbit" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)"/><circle cx="12" cy="12" r="4"/><path d="M18 3h4v4"/></symbol>
+ <symbol id="i-tag" viewBox="0 0 24 24"><path d="M4 4h8l9 9-8 8-9-9V4Z"/><circle cx="8.5" cy="8.5" r="1"/></symbol>
+ <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></symbol>
+ <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></symbol>
+ <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 10 5-10 5L2 8l10-5ZM2 12l10 5 10-5M2 16l10 5 10-5"/></symbol>
+ <symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="m12 12 7-7"/><circle cx="12" cy="12" r="1"/></symbol>
+ <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+ <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></symbol>
+ <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+ <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></symbol>
+ <symbol id="i-picture" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 6-6 4 4 3-3 5 5"/></symbol>
+ <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+ <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11Z"/></symbol>
+</defs></svg>
+<div class="app" id="app">
+ <header class="topbar">
+  <a class="brand" href="#" id="brand-reset" aria-label="스마트 카트 전체 보기"><svg class="brand-mark"><use href="#i-cube"/></svg><span>SMART CART<span class="brand-light">STUDIO</span></span></a>
+  <div class="header-divider"></div><span class="header-context">ENGINEERING VISUALIZATION</span>
+  <div class="header-right"><span class="version"><i></i> PHOTO-BASED MODEL <span>01</span></span><button id="help-btn" class="icon-btn help-btn" title="조작법" aria-label="조작법"><svg><use href="#i-info"/></svg></button><button id="capture-btn" class="export-btn"><svg><use href="#i-save"/></svg><span>PNG 저장</span></button></div>
+ </header>
+ <main class="workspace">
+  <section class="stage" id="stage" aria-label="스마트 카트 3D 뷰어">
+   <canvas id="scene" tabindex="0" aria-label="스마트 카트 3D 모델. 마우스로 회전, 휠로 확대, 방향키로 회전할 수 있습니다."></canvas>
+   <div class="stage-head">
+    <div class="eyebrow"><span class="orange-line"></span> MULTI-SENSOR FUSION</div>
+    <h1>사용자 추종형<br><span>스마트 카트</span><span class="title-dot">.</span></h1>
+    <p class="stage-subtitle">프레임부터 센서까지, 구조를 직접 살펴보세요.</p>
+   </div>
+   <div class="render-state"><span class="status-dot"></span><span id="render-status">3D STUDIO</span><span class="render-divider">/</span><span id="view-label">사시도</span></div>
+   <div class="sensor-note" id="sensor-note" hidden><span class="status-dot"></span><div>센서 작동 원리 도식<small>범위 · 광선 · 태그 위치는 실측값이 아닙니다.</small></div></div>
+   <div id="markers" class="markers" aria-label="부품 위치 표시"></div>
+   <div class="toolbar" aria-label="뷰어 도구">
+    <button class="tool-btn" id="reset-btn" title="시점 초기화 (0)" aria-label="시점 초기화"><svg><use href="#i-home"/></svg></button>
+    <button class="tool-btn" id="auto-btn" title="자동 회전 (A)" aria-label="자동 회전" aria-pressed="false"><svg><use href="#i-orbit"/></svg></button>
+    <span class="tool-separator"></span>
+    <button class="tool-btn" id="labels-btn" title="부품 라벨 (L)" aria-label="부품 라벨" aria-pressed="false"><svg><use href="#i-tag"/></svg></button>
+    <button class="tool-btn" id="grid-btn" title="바닥 그리드 (G)" aria-label="바닥 그리드" aria-pressed="false"><svg><use href="#i-grid"/></svg></button>
+    <span class="tool-separator"></span>
+    <button class="tool-btn" id="full-btn" title="뷰어 전체 화면" aria-label="뷰어 전체 화면"><svg><use href="#i-full"/></svg></button>
+   </div>
+   <div class="view-control"><svg class="view-cube"><use href="#i-cube"/></svg><label for="camera-select" class="sr-only">카메라 시점</label><select id="camera-select"><option value="iso">사시도</option><option value="front">정면</option><option value="side">측면</option><option value="rear">후면</option><option value="top">상부</option><option value="bottom">하부 · 사진 시점</option></select></div>
+   <div class="stage-bottom">
+    <div class="finish"><span class="finish-title">MATERIAL FINISH</span><div><i class="swatch graphite"></i><i class="swatch silver"></i><i class="swatch orange"></i><span>Graphite / Signal orange</span></div></div>
+    <div class="mode-switch" role="group" aria-label="보기 모드">
+     <button data-mode="studio" class="active" aria-pressed="true"><svg><use href="#i-cube"/></svg>제품 보기</button>
+     <button data-mode="sensors" aria-pressed="false"><svg><use href="#i-radar"/></svg>센서 보기</button>
+     <button data-mode="bottom" aria-pressed="false"><svg><use href="#i-layers"/></svg>하부 보기</button>
+    </div>
+   </div>
+   <div class="orbit-hint"><span class="mouse-outline"></span> 드래그 회전 <b>·</b> 휠 확대 <b>·</b> 우클릭 이동 <b>·</b> 부품 클릭</div>
+   <div id="loading" class="loading"><div class="loader-cube"><svg><use href="#i-cube"/></svg></div><strong>스마트 카트 구성 중</strong><span id="load-message">형상 · 재질 · 스튜디오 조명 초기화</span><div class="loading-line"><span></span></div></div>
+   <div id="fatal-error" class="fatal-error" hidden><svg><use href="#i-info"/></svg><h2>3D 화면을 시작하지 못했습니다.</h2><p id="error-message"></p><button id="reload-btn">새로고침</button></div>
+   <noscript><div class="fatal-error"><h2>JavaScript가 필요합니다.</h2><p>이 뷰어를 사용하려면 브라우저의 JavaScript 실행을 허용해 주세요.</p></div></noscript>
+  </section>
+  <aside class="inspector" aria-label="구성 요소 및 렌더링 설정">
+   <div class="inspector-heading"><h2>구성 요소</h2><button class="text-btn" id="show-all">전체 보기 <span>↗</span></button></div>
+   <div class="component-list" id="component-list">
+    <button class="component" data-key="frame"><span class="component-index">01</span><span class="component-name">프레임 · 적재판<small>CHASSIS & DECK</small></span><svg><use href="#i-arrow"/></svg></button>
+    <button class="component" data-key="drive"><span class="component-index">02</span><span class="component-name">좌우 독립 구동계<small>DUAL MOTOR DRIVE</small></span><span class="component-tag">×2</span><svg><use href="#i-arrow"/></svg></button>
+    <button class="component" data-key="uwb"><span class="component-index">03</span><span class="component-name">사용자 위치 추적<small>BU04 · PDoA UWB</small></span><span class="component-tag">×2</span><svg><use href="#i-arrow"/></svg></button>
+    <button class="component" data-key="lidar"><span class="component-index">04</span><span class="component-name">주변 · 바닥 인식<small>2D LiDAR / ToF</small></span><svg><use href="#i-arrow"/></svg></button>
+    <button class="component" data-key="compute"><span class="component-index">05</span><span class="component-name">센서 융합 · 제어<small>ROS 2 / ESP32 / IMU</small></span><svg><use href="#i-arrow"/></svg></button>
+    <button class="component" data-key="power"><span class="component-index">06</span><span class="component-name">전원 · 전장 박스<small>POWER & ELECTRONICS</small></span><svg><use href="#i-arrow"/></svg></button>
+   </div>
+   <section class="component-detail" aria-live="polite"><div class="detail-eyebrow" id="detail-en">SYSTEM OVERVIEW</div><h3 id="detail-name">전체 구성</h3><p id="detail-text">사진을 바탕으로 재구성한 3D 모델입니다.</p><dl id="detail-specs"></dl><button id="reveal-btn" class="reveal-btn" hidden><svg><use href="#i-eye"/></svg>커버를 열고 내부 보기</button></section>
+   <section class="assembly-controls"><div class="control-label"><label for="explode">분해 보기</label><output id="explode-value" for="explode">0<span>%</span></output></div><input id="explode" type="range" min="0" max="100" step="1" value="0" aria-label="부품 분해 정도"><div class="range-labels"><span>조립 상태</span><span>부품 분리</span></div><label class="switch-row" for="open-cover"><span>적재판 · 전장 커버 열기</span><input type="checkbox" id="open-cover"><span class="switch" aria-hidden="true"></span></label></section>
+   <details class="render-settings"><summary><svg><use href="#i-settings"/></svg>표시 설정<span>+</span></summary><div class="settings-inner"><div class="setting-row"><span>스튜디오 배경</span><div class="theme-switch"><button data-theme="dark" class="active" aria-label="다크 스튜디오" aria-pressed="true"><svg><use href="#i-moon"/></svg></button><button data-theme="light" aria-label="라이트 스튜디오" aria-pressed="false"><svg><use href="#i-sun"/></svg></button></div></div><div class="control-label"><label for="exposure">조명 밝기</label><output id="exposure-value">1.03</output></div><input id="exposure" type="range" min="60" max="155" step="1" value="103"><label class="setting-row" for="quality">렌더 해상도<select id="quality"><option value="high">고품질</option><option value="balanced">성능 우선</option></select></label></div></details>
+   <button class="reference-card" id="reference-btn"><img src="./assets/images/reference.jpg" alt="재구성 기준이 된 FreeCAD 스마트 카트 이미지"><span>원본 이미지 · 모델링 기준<small>FreeCAD reference image</small></span><svg><use href="#i-arrow"/></svg></button>
+  </aside>
+ </main>
+ <section class="spec-strip" aria-label="사용자가 제공한 설계 구성">
+  <div class="spec-item"><span class="spec-label">SYSTEM VOLTAGE</span><strong>24<span>V</span></strong><small>설계 전원</small></div>
+  <div class="spec-item"><span class="spec-label">DIFFERENTIAL DRIVE</span><strong>250<span>W × 2</span></strong><small>좌우 독립 감속모터</small></div>
+  <div class="spec-item"><span class="spec-label">PERCEPTION</span><strong class="spec-text">UWB <span>+</span> LiDAR</strong><small>사용자 위치 · 주변 장애물</small></div>
+  <div class="spec-item"><span class="spec-label">CONTROL ARCHITECTURE</span><strong class="spec-text">ROS 2 <span>+</span> ESP32</strong><small>상위 계획 · 하위 모터 제어</small></div>
+ </section>
+ <footer class="footer"><span><i></i> 사진 기반 시각화 모델 · 실측 CAD 및 실시간 센서 데이터가 아닙니다.</span><span class="footer-tech">LOCAL WEBGL 2 <b>/</b> NO EXTERNAL RUNTIME</span></footer>
+</div>
+<dialog id="reference-dialog" class="reference-dialog"><div class="dialog-top"><span>REFERENCE / MODEL ASSUMPTIONS</span><button class="icon-btn dialog-close" aria-label="닫기"><svg><use href="#i-close"/></svg></button></div><div class="reference-content"><div class="reference-image"><img src="./assets/images/reference.jpg" alt="사용자가 제공한 스마트 카트 FreeCAD 렌더링. 하부에서 바라본 프레임, 후륜 구동 바퀴, 캐스터 및 배터리 박스."></div><div class="reference-copy"><div class="eyebrow">PHOTO-BASED RECONSTRUCTION</div><h2>사진을 기준으로,<br>구조를 다시 만들었습니다.</h2><p>원본 FreeCAD 파일을 가져온 것이 아니라, 제공된 이미지에서 보이는 구조와 설명을 바탕으로 절차적 3D 형상을 재구성했습니다.</p><div class="assumption"><strong>사진에서 참고한 부분</strong><p>각형 프레임, 가드 레일, 손잡이, 큰 구동 바퀴 2개, 전면 캐스터 및 하부 박스 배치.</p></div><div class="assumption"><strong>설명으로 보완한 부분</strong><p>UWB, 2D LiDAR, IMU, ToF, 컴퓨팅 보드 및 배선. 센서 하우징, ToF 수량과 배치는 추정입니다.</p></div><p class="reference-caution">치수, 재질 규격, 배터리 용량, 허용 하중, 제동 및 전도 안전성을 검증하는 모델은 아닙니다. 탑승 기능은 구현하지 않았습니다.</p><button class="primary-btn" id="reference-view-btn"><svg><use href="#i-layers"/></svg>하부 · 사진 시점으로 보기</button></div></div></dialog>
+<dialog id="help-dialog" class="help-dialog"><div class="dialog-top"><span>VIEWER CONTROLS</span><button class="icon-btn dialog-close" aria-label="닫기"><svg><use href="#i-close"/></svg></button></div><div class="help-content"><h2>모델을 직접 살펴보세요.</h2><dl class="help-table"><div><dt>마우스 왼쪽 드래그</dt><dd>회전</dd></div><div><dt>마우스 휠 / 두 손가락 확대</dt><dd>확대 · 축소</dd></div><div><dt>우클릭 드래그 / 두 손가락 이동</dt><dd>화면 이동</dd></div><div><dt>부품 클릭 / 구성 요소 선택</dt><dd>부품 강조 · 설명</dd></div><div><dt><kbd>0</kbd> / <kbd>A</kbd> / <kbd>L</kbd> / <kbd>G</kbd></dt><dd>초기 시점 / 자동 회전 / 라벨 / 그리드</dd></div><div><dt><kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></dt><dd>제품 / 센서 / 하부 보기</dd></div></dl><p>센서 보기의 광선과 태그는 작동 원리 설명을 위한 도식입니다. 실제 추종 알고리즘이나 센서 통신은 실행되지 않습니다.</p></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

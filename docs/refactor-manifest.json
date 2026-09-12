@@ -1,0 +1,51 @@
+{
+  "source": "Smart-Cart-Studio.html",
+  "source_sha256": "3e571946039375b8f9bdbf4f839c84b6e180647c80f8f5a99f21c20ea17c23f2",
+  "change_scope": "Externalize existing style, ordered scripts, and embedded image assets. No rendering or interaction code changes.",
+  "styles": [
+    {
+      "path": "css/styles.css",
+      "sha256": "a80f5f5b5b913d803c390f9b89fe73597eb32a5540669129abbaf253e82fe375",
+      "matches_original_inline_content": true
+    }
+  ],
+  "scripts": [
+    {
+      "path": "js/math.js",
+      "sha256": "ff16d9c847f568bb5d17584a38c92ea9a23a2547a8f2e91a07888732e3c35977",
+      "matches_original_inline_content": true
+    },
+    {
+      "path": "js/geometry.js",
+      "sha256": "b7b4ddc08eb7d9c04f8e4472fa88b573f9bcf29002f17d4b309d1e900dc557a2",
+      "matches_original_inline_content": true
+    },
+    {
+      "path": "js/cart-model.js",
+      "sha256": "5fe2b3878b7d42e98b062061373e5ea6207c9a7608c9d85b47c870a9efe96f0d",
+      "matches_original_inline_content": true
+    },
+    {
+      "path": "js/renderer.js",
+      "sha256": "6a372713427f5e328085eb2145bd8324d39c4ae8d03eb850372806dd76270896",
+      "matches_original_inline_content": true
+    },
+    {
+      "path": "js/app.js",
+      "sha256": "e8e6c09dc37abdf4e0cd22dbff23dccd54552e8b50426a22968ed1ed5963cf16",
+      "matches_original_inline_content": true
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/images/reference.jpg",
+      "sha256": "4eb0450a09d777fe7d40509d989b95505606ca0897b8e63d011c40402fccc341",
+      "source": "Original inline JPEG used twice; decoded once without recompression."
+    },
+    {
+      "path": "assets/icons/favicon.svg",
+      "sha256": "2b5a211f4396ec4257ef37ec76360cad746b8972668b91503a5ab4451e0e8b95",
+      "source": "Original inline SVG favicon, URI decoded."
+    }
+  ]
+}
